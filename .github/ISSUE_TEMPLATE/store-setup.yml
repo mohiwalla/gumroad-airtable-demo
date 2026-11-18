@@ -1,0 +1,24 @@
+name: Ask about setup for a store
+description: Request a quote for connecting one Gumroad store to an Airtable table.
+title: "Setup inquiry"
+body:
+  - type: markdown
+    attributes:
+      value: |
+        This inquiry is public. Use general descriptions here. Keep customer emails, order IDs, credentials and other private details out of the issue. If you prefer, email kamal@mohiwalla.com.
+  - type: dropdown
+    id: store
+    attributes:
+      label: Is the Gumroad store taking orders?
+      options:
+        - Already taking orders
+        - Preparing to launch
+    validations:
+      required: true
+  - type: textarea
+    id: setup
+    attributes:
+      label: What should happen when someone buys?
+      description: Include the fields you need, how quickly rows should appear and whether you already have a scheduler.
+    validations:
+      required: true
