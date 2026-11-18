@@ -9,6 +9,8 @@ The [public demo run](https://github.com/mohiwalla/gumroad-airtable-demo/actions
 | Workbook | $24.99 | mira@example.invalid | Yes |
 | Sampler | $0.00 | sam@example.invalid | No |
 
+The companion [n8n workflow](n8n/) compares two fictional sales exports. It sends matching records to one list and sales with conflicting amounts, currencies, IDs or contact permissions to a review list.
+
 For a store owner who wants the integration set up, a one-store, one-table pilot is $295 USD. It includes column mapping, scheduled imports on your host, verification against a sale in your own accounts, and handover. Keep store data and credentials private. [Ask about setup](https://github.com/mohiwalla/gumroad-airtable-demo/issues/new?template=store-setup.yml) · [Email Kamaljot Singh privately](mailto:kamal@mohiwalla.com)
 
 ## Try it offline

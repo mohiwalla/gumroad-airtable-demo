@@ -1,0 +1,218 @@
+{
+  "id": "SalesReconcileDemo01",
+  "name": "Reconcile two sales exports",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "a43d9610-5321-5594-beed-33bf83843ad3",
+      "name": "Run demo",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        40
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "{\n  \"ledger\": \"source\",\n  \"sales\": [\n    {\n      \"sale_id\": \"demo-01\",\n      \"amount_minor\": 4900,\n      \"currency\": \"USD\",\n      \"allow_follow_up\": true\n    },\n    {\n      \"sale_id\": \"demo-02\",\n      \"amount_minor\": 2900,\n      \"currency\": \"USD\",\n      \"allow_follow_up\": false\n    },\n    {\n      \"sale_id\": \"demo-03\",\n      \"amount_minor\": 2500,\n      \"currency\": \"USD\",\n      \"allow_follow_up\": true\n    },\n    {\n      \"sale_id\": \"demo-04\",\n      \"amount_minor\": 1800,\n      \"currency\": \"USD\",\n      \"allow_follow_up\": true\n    },\n    {\n      \"sale_id\": \"demo-06\",\n      \"amount_minor\": 3500,\n      \"currency\": \"USD\",\n      \"allow_follow_up\": true\n    },\n    {\n      \"sale_id\": \"demo-06\",\n      \"amount_minor\": 3500,\n      \"currency\": \"USD\",\n      \"allow_follow_up\": false\n    },\n    {\n      \"sale_id\": \"demo-07\",\n      \"amount_minor\": 1000,\n      \"currency\": \"USD\",\n      \"allow_follow_up\": true\n    },\n    {\n      \"sale_id\": \"demo-08\",\n      \"amount_minor\": 4400,\n      \"currency\": \"USD\",\n      \"allow_follow_up\": false\n    },\n    {\n      \"sale_id\": \"demo-09\",\n      \"amount_minor\": 600,\n      \"currency\": \"EUR\",\n      \"allow_follow_up\": true\n    },\n    {\n      \"sale_id\": \"demo-10\",\n      \"amount_minor\": 0,\n      \"currency\": \"USD\",\n      \"allow_follow_up\": true\n    }\n  ]\n}",
+        "options": {}
+      },
+      "id": "8d49a741-dbe0-5188-84b4-ea5247a40743",
+      "name": "Source sales export",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        220,
+        -70
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "{\n  \"ledger\": \"destination\",\n  \"sales\": [\n    {\n      \"sale_id\": \"demo-01\",\n      \"amount_minor\": 4900,\n      \"currency\": \"USD\",\n      \"allow_follow_up\": true\n    },\n    {\n      \"sale_id\": \"demo-02\",\n      \"amount_minor\": 2900,\n      \"currency\": \"USD\",\n      \"allow_follow_up\": false\n    },\n    {\n      \"sale_id\": \"demo-03\",\n      \"amount_minor\": 2050,\n      \"currency\": \"USD\",\n      \"allow_follow_up\": true\n    },\n    {\n      \"sale_id\": \"demo-05\",\n      \"amount_minor\": 900,\n      \"currency\": \"USD\",\n      \"allow_follow_up\": true\n    },\n    {\n      \"sale_id\": \"demo-06\",\n      \"amount_minor\": 3500,\n      \"currency\": \"USD\",\n      \"allow_follow_up\": true\n    },\n    {\n      \"sale_id\": \"demo-07\",\n      \"amount_minor\": 1000,\n      \"currency\": \"USD\",\n      \"allow_follow_up\": true\n    },\n    {\n      \"sale_id\": \"demo-07\",\n      \"amount_minor\": 1000,\n      \"currency\": \"USD\",\n      \"allow_follow_up\": true\n    },\n    {\n      \"sale_id\": \"demo-08\",\n      \"amount_minor\": 4400,\n      \"currency\": \"USD\",\n      \"allow_follow_up\": true\n    },\n    {\n      \"sale_id\": \"demo-09\",\n      \"amount_minor\": 600,\n      \"currency\": \"USD\",\n      \"allow_follow_up\": true\n    },\n    {\n      \"sale_id\": \"demo-10\",\n      \"amount_minor\": 0,\n      \"currency\": \"USD\",\n      \"allow_follow_up\": true\n    }\n  ]\n}",
+        "options": {}
+      },
+      "id": "cd707f7c-0bee-533a-b331-3ebbb3622a6b",
+      "name": "Destination sales export",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        220,
+        160
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "append",
+        "numberInputs": 2
+      },
+      "id": "4c01b4c2-8cd7-5c12-8abc-2cc0dce0aa2f",
+      "name": "Collect both exports",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        470,
+        40
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const ledgers = { source: null, destination: null };\nfor (const item of $input.all()) {\n  const { ledger, sales } = item.json;\n  if (!Object.hasOwn(ledgers, ledger) || ledgers[ledger] !== null || !Array.isArray(sales)) {\n    throw new Error('Expected one source export and one destination export');\n  }\n  ledgers[ledger] = sales;\n}\n\nconst groups = new Map();\nfor (const [ledger, sales] of Object.entries(ledgers)) {\n  if (sales === null) throw new Error('Missing ' + ledger + ' export');\n  for (const row of sales) {\n    if (typeof row.sale_id !== 'string' || !row.sale_id.trim() ||\n        !Number.isSafeInteger(row.amount_minor) || !/^[A-Z]{3}$/.test(row.currency) ||\n        typeof row.allow_follow_up !== 'boolean') {\n      throw new Error('Invalid row in ' + ledger + ' export');\n    }\n    if (!groups.has(row.sale_id)) groups.set(row.sale_id, { source: [], destination: [] });\n    groups.get(row.sale_id)[ledger].push(row);\n  }\n}\n\nreturn [...groups.keys()].sort().map(sale_id => {\n  const { source, destination } = groups.get(sale_id);\n  const issues = [];\n  if (source.length === 0) issues.push('unexpected_destination_sale');\n  if (destination.length === 0) issues.push('missing_destination_sale');\n  if (source.length > 1) issues.push('duplicate_source_id');\n  if (destination.length > 1) issues.push('duplicate_destination_id');\n  if (source.length === 1 && destination.length === 1) {\n    if (source[0].amount_minor !== destination[0].amount_minor) issues.push('amount_mismatch');\n    if (source[0].currency !== destination[0].currency) issues.push('currency_mismatch');\n    if (source[0].allow_follow_up !== destination[0].allow_follow_up) issues.push('consent_mismatch');\n  }\n  const needs_review = issues.length > 0;\n  const follow_up_allowed = !needs_review && source[0].allow_follow_up && destination[0].allow_follow_up;\n  return { json: { sale_id, needs_review, issues, follow_up_allowed, source, destination } };\n});"
+      },
+      "id": "dc29b5b1-13ef-5cd4-ba86-40471c558796",
+      "name": "Reconcile by Sale ID",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        700,
+        40
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "version": 2,
+            "caseSensitive": true,
+            "typeValidation": "strict",
+            "leftValue": ""
+          },
+          "conditions": [
+            {
+              "id": "58d75960-87e5-5123-ad24-b232172242b9",
+              "leftValue": "={{ $json.needs_review }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "f9cf1dcf-3f60-549a-88ca-148e80b2856c",
+      "name": "Needs review?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        930,
+        40
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "a1b4e05d-8c03-546d-977b-a15a2dd4e593",
+      "name": "Exceptions for review",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        1170,
+        -70
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "151914e3-482e-5efb-ad07-68daf7fbf382",
+      "name": "Clean sales",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        1170,
+        160
+      ]
+    }
+  ],
+  "connections": {
+    "Run demo": {
+      "main": [
+        [
+          {
+            "node": "Source sales export",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Destination sales export",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Source sales export": {
+      "main": [
+        [
+          {
+            "node": "Collect both exports",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Destination sales export": {
+      "main": [
+        [
+          {
+            "node": "Collect both exports",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Collect both exports": {
+      "main": [
+        [
+          {
+            "node": "Reconcile by Sale ID",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Reconcile by Sale ID": {
+      "main": [
+        [
+          {
+            "node": "Needs review?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Needs review?": {
+      "main": [
+        [
+          {
+            "node": "Exceptions for review",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Clean sales",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "9bbc7600-b6db-5afa-9a72-6ebc0f5e8ee6",
+  "pinData": {},
+  "tags": []
+}

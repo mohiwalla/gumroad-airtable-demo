@@ -1,0 +1,31 @@
+name: Run the reconciliation in n8n
+on:
+  push:
+    paths:
+      - 'n8n/**'
+      - '.github/workflows/n8n.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  reconcile:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Import and execute the example with fictional sales
+        run: |
+          docker run --rm --network none \
+            --tmpfs /home/node/.n8n:uid=1000,gid=1000,mode=0700 \
+            -e N8N_DIAGNOSTICS_ENABLED=false \
+            -e N8N_VERSION_NOTIFICATIONS_ENABLED=false \
+            -e N8N_TEMPLATES_ENABLED=false \
+            -v "$PWD/n8n/workflow.json:/demo/workflow.json:ro" \
+            --entrypoint /bin/sh \
+            n8nio/n8n:2.48.5 \
+            -ec 'n8n import:workflow --input=/demo/workflow.json >&2
+                 n8n execute --id=SalesReconcileDemo01 --rawOutput' > "$RUNNER_TEMP/execution.log"
+      - name: Verify clean records, exceptions and opt-outs
+        run: python3 n8n/verify.py "$RUNNER_TEMP/execution.log"
