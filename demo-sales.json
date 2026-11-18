@@ -1,0 +1,4 @@
+[
+  {"success":true,"sales":[{"id":"demo-paid","product_id":"demo-workbook","email":"mira@example.invalid","created_at":"2026-10-12T15:30:00Z","price":2499,"formatted_display_price":"$24.99","can_contact":true,"refunded":false,"partially_refunded":false}],"next_page_key":"demo-page-2"},
+  {"success":true,"sales":[{"id":"demo-free","product_id":"demo-sampler","email":"sam@example.invalid","created_at":"2026-10-11T11:00:00+02:00","price":0,"formatted_display_price":"$0","can_contact":false,"refunded":false,"partially_refunded":false}]}
+]

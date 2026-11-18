@@ -1,0 +1,46 @@
+[
+  {
+    "success": true,
+    "next_page_key": "fixture-page-two",
+    "sales": [
+      {
+        "id": "demo-sale-003",
+        "email": "river@example.invalid",
+        "created_at": "2026-11-17T18:20:03Z",
+        "product_id": "demo-product-guide",
+        "price": 3700,
+        "formatted_display_price": "$37",
+        "can_contact": false,
+        "refunded": false,
+        "partially_refunded": false
+      },
+      {
+        "id": "demo-sale-002",
+        "email": "sage@example.invalid",
+        "created_at": "2026-11-17T18:20:03Z",
+        "product_id": "demo-product-checklist",
+        "price": 0,
+        "formatted_display_price": "$0",
+        "can_contact": true,
+        "refunded": false,
+        "partially_refunded": false
+      }
+    ]
+  },
+  {
+    "success": true,
+    "sales": [
+      {
+        "id": "demo-sale-001",
+        "email": "river@example.invalid",
+        "created_at": "2026-11-16T09:00:00Z",
+        "product_id": "demo-product-checklist",
+        "price": 1499,
+        "formatted_display_price": "$14.99",
+        "can_contact": true,
+        "refunded": false,
+        "partially_refunded": false
+      }
+    ]
+  }
+]

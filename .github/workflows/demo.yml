@@ -1,0 +1,18 @@
+name: Verify the sales sync
+on: [push, workflow_dispatch]
+permissions:
+  contents: read
+jobs:
+  demo:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Run the fictional store twice and show the resulting rows
+        run: python3 sync_sales.py --demo
+      - name: Verify refunds and recovery after a lost response
+        run: python3 acceptance_check.py
+      - name: Run the unit tests
+        run: python3 -m unittest discover -v
